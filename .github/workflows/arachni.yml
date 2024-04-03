@@ -18,16 +18,24 @@ jobs:
           wget https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
           tar -xzf arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
           cd arachni-1.5.1-0.5.12/bin
-          ./arachni https://testphp.vulnweb.com/ --report ./.github arachni_report.afr
+          ./arachni https://testphp.vulnweb.com/ --report $GITHUB_WORKSPACE arachni_report.afr
+
+      - name: Save .afr file to workspace
+        run: |
+          mv $GITHUB_WORKSPACE/arachni_report.afr $GITHUB_WORKSPACE/arachni_report.afr
 
       - name: Convert .afr to HTML
         run: |
-          ./.github/arachni_reporter -f html $GITHUB_WORKSPACE/arachni_report.afr
+          $GITHUB_WORKSPACE/arachni_reporter -f html $GITHUB_WORKSPACE/arachni_report.afr
           mv arachni_report.html $GITHUB_WORKSPACE/arachni_report.html
 
-      - name: Upload HTML report
+      - name: Package HTML report into zip
+        run: |
+          zip -r $GITHUB_WORKSPACE/arachni_report.zip $GITHUB_WORKSPACE/arachni_report.html $GITHUB_WORKSPACE/arachni_report.afr
+
+      - name: Upload zip artifact
         uses: actions/upload-artifact@v2
         with:
           name: arachni-report
-          path: $GITHUB_WORKSPACE/arachni_report.html
+          path: $GITHUB_WORKSPACE/arachni_report.zip
 
