@@ -18,7 +18,7 @@ jobs:
 
       - name: Run Arachni scan
         run: |
-          docker run --rm -v $GITHUB_WORKSPACE:/home/arachni/reports arachni/arachni /usr/local/bin/arachni "http://testphp.vulnweb.com/" --report=arachni_report.afr
+          docker run --rm -v $GITHUB_WORKSPACE:/home/arachni/reports arachni/arachni /home/arachni/bin/arachni "http://testphp.vulnweb.com/" --report=/home/arachni/reports/arachni_report.afr
 
       - name: Convert .afr to HTML
         run: |
