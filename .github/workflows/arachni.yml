@@ -5,28 +5,24 @@ on:
   workflow_call:
 
 jobs:
-  Archani-scan:
-    name: Arachani
+  arachni-scan:
+    name: Arachni
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Install Arachni
-        run: |
-          wget https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
-          tar -xzf arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
-          cd arachni-1.5.1-0.5.12/bin
-          ./arachni https://testphp.vulnweb.com/ --report $GITHUB_WORKSPACE arachni_report.afr
+      - name: Install Arachni Docker image
+        run: docker pull arachni/arachni
 
-      - name: Save .afr file to workspace
+      - name: Run Arachni scan
         run: |
-          mv $GITHUB_WORKSPACE/arachni_report.afr $GITHUB_WORKSPACE/arachni_report.afr
+          docker run --rm -v $GITHUB_WORKSPACE:/home/arachni/reports arachni/arachni http://testphp.vulnweb.com/ --report=arachni_report.afr
 
       - name: Convert .afr to HTML
         run: |
-          $GITHUB_WORKSPACE/arachni_reporter -f html $GITHUB_WORKSPACE/arachni_report.afr
+          docker run --rm -v $GITHUB_WORKSPACE:/home/arachni/reports arachni/arachni_reporter -f html /home/arachni/reports/arachni_report.afr
           mv arachni_report.html $GITHUB_WORKSPACE/arachni_report.html
 
       - name: Package HTML report into zip
@@ -38,4 +34,3 @@ jobs:
         with:
           name: arachni-report
           path: $GITHUB_WORKSPACE/arachni_report.zip
-
