@@ -20,14 +20,9 @@ jobs:
           cd arachni-1.5.1-0.5.12/bin
           ./arachni https://testphp.vulnweb.com/ --report-save-path=arachni_report.afr
 
-      - name: Convert AFR to HTML
-        run: |
-          ./arachni_reporter -f html arachni_report.afr
-          mv arachni_report.html $GITHUB_WORKSPACE/arachni_report.html
-
-      - name: Upload Arachni HTML Report
+      - name: Upload Arachni Report
         uses: actions/upload-artifact@v2
         with:
-          name: arachni-html-report
-          path: arachni_report.html
+          name: arachni-report
+          path: arachni_report.afr
 
