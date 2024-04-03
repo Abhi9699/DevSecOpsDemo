@@ -6,3 +6,12 @@ on:
       - '**/*.md'
       - '**/*.txt'
   workflow_dispatch:
+  
+jobs:
+  dast:
+    name: DAST Scan
+    uses: ./.github/workflows/dast.yml
+    secrets: inherit
+    with:
+      image-tag: ${{ needs.docker.outputs.image-tag }}
+    
