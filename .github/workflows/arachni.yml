@@ -1,0 +1,21 @@
+name: Arachni Scan
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  arachni_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Arachni
+        run: sudo apt-get install arachni -y
+      - name: Run Arachni Scan
+        run: arachni http://www.example.com --report-save-path=arachni_report.afr
+      - name: Upload Arachni Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: arachni-report
+          path: arachni_report.afr
