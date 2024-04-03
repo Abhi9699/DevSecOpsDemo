@@ -14,4 +14,10 @@ jobs:
     secrets: inherit
     with:
       image-tag: ${{ needs.docker.outputs.image-tag }}
-    
+
+  arachni:
+    name: Arachni scan 
+    uses: ./.github/workflows/arachni.yml
+    secrets: inherit
+    with:
+      image-tag: ${{ needs.docker.outputs.image-tag }}
