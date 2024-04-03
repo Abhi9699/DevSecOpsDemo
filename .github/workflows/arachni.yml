@@ -5,29 +5,32 @@ on:
   workflow_call:
 
 jobs:
-  arachni-scan:
-    name: Arachni
+  arachni_scan:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
-      - name: Install Arachni Docker image
-        run: docker pull arachni/arachni
+    - name: Setup Arachni
+      run: |
+        sudo apt-get update && sudo apt-get install -y build-essential libsqlite3-dev ruby-dev
+        gem install bundler
+        git clone --depth 1 https://github.com/Arachni/arachni.git
+        cd arachni
+        bundle install --without profiling development
+        echo "Arachni installed successfully"
 
-      - name: Run Arachni scan
-        run: |
-          docker run --rm -v $GITHUB_WORKSPACE:/home/arachni/reports arachni/arachni /usr/local/bundle/bin/arachni "http://testphp.vulnweb.com/" --report=/home/arachni/reports/arachni_report.afr
+    - name: Run Arachni Scan
+      run: |
+        cd arachni
+        ./bin/arachni http://testphp.vulnweb.com/ --report-save-path=arachni_report.afr
 
-      - name: Convert .afr to HTML
-        run: |
-          docker run --rm -v $GITHUB_WORKSPACE:/home/arachni/reports arachni/arachni_reporter -f html /home/arachni/reports/arachni_report.afr
-          mv arachni_report.html $GITHUB_WORKSPACE/arachni_report.html
-
-      - name: Package HTML report into zip
-        run: |
-          zip -r $GITHUB_WORKSPACE/arachni_report.zip $GITHUB_WORKSPACE/arachni_report.html $GITHUB_WORKSPACE/arachni_report.afr
+    - name: Upload Arachni Report
+      uses: actions/upload-artifact@v2
+      with:
+        name: arachni_report
+        path: arachni/arachni_report.afr
 
       - name: Upload zip artifact
         uses: actions/upload-artifact@v2
