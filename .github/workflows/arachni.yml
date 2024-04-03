@@ -3,10 +3,10 @@ name: Arachni Scan
 on:
   workflow_dispatch:
   workflow_call:
-  
+
 jobs:
-  dast_scan:
-    name: DAST Scan
+  Archani-scan:
+    name: Arachani
     runs-on: ubuntu-latest
 
     steps:
@@ -18,11 +18,16 @@ jobs:
           wget https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
           tar -xzf arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
           cd arachni-1.5.1-0.5.12/bin
-          ./arachni http://www.example.com --report-save-path=arachni_report.afr
+          ./arachni https://testphp.vulnweb.com/ --report-save-path=arachni_report.afr
 
-      - name: Upload Arachni Report
+      - name: Convert AFR to HTML
+        run: |
+          ./arachni_reporter -f html arachni_report.afr
+          mv arachni_report.html $GITHUB_WORKSPACE/arachni_report.html
+
+      - name: Upload Arachni HTML Report
         uses: actions/upload-artifact@v2
         with:
-          name: arachni-report
-          path: arachni_report.afr
+          name: arachni-html-report
+          path: arachni_report.html
 
