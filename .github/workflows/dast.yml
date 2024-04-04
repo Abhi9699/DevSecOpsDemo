@@ -1,11 +1,9 @@
 name: DAST Scan
+
 on:
-  workflow_dispatch: 
-    inputs:
-      image-tag:
-        type: string
-        description: 'The name of the Docker image to scan'
-        required: true
+  push:
+    branches:
+      - main  # Adjust the branch name as needed
 
 jobs:
   dast-scan:
